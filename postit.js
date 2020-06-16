@@ -43,7 +43,6 @@ class Post_it {
         })
         document.getElementById('postit').appendChild(monElem)
 
-
         //Définition des boutons
 
         let monBoutonDep=document.createElement('i');
@@ -81,9 +80,7 @@ class Post_it {
         let monBoutonTrash=document.createElement('i');
         monBoutonTrash.classList.add('fas', 'fa-trash-alt')
         mesBout.appendChild(monBoutonTrash)
-        
-
-        
+            
     }
 
     Bougepostit(newX, newY){  //pour deplacer le post it
