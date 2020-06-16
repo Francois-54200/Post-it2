@@ -38,9 +38,52 @@ class Post_it {
         let mesBout=document.createElement('div');
         mesBout.className = 'Bout'
         monElem.appendChild(mesBout)
+        monElem.addEventListener('click',(e)=>{
+            postitdep=false
+        })
         document.getElementById('postit').appendChild(monElem)
 
-        mesBout.innerHTML+='<i class="far fa-arrows-alt"><i class="fas fa-edit"><i class="fas fa-expand-alt"><i class="fas fa-level-up-alt"><i class="fas fa-level-down-alt"><i class="fas fa-trash-alt"></i>'
+
+        //Définition des boutons
+
+        let monBoutonDep=document.createElement('i');
+        monBoutonDep.classList.add('fas', 'fa-arrows-alt')
+        monBoutonDep.addEventListener('click',(e)=>{ 
+            postitdep=!postitdep
+            e.stopPropagation()
+        })
+        mesBout.appendChild(monBoutonDep)
+
+        let monBoutonEdit=document.createElement('i');
+        monBoutonEdit.classList.add('fas', 'fa-edit')
+        mesBout.appendChild(monBoutonEdit)
+
+        let monBoutonExpand=document.createElement('i');
+        monBoutonExpand.classList.add('fas', 'fa-expand-alt')
+        monBoutonExpand.addEventListener('click',(e)=>{
+            this.largeurInit=this.largeur
+            this.hauteurInit=this.hauteur
+            this.Xdepart=Xposition
+            this.Ydepart=Yposition
+            postitExp=!postitExp
+            e.stopPropagation()
+        })
+        mesBout.appendChild(monBoutonExpand)
+
+        let monBoutonLevelUp=document.createElement('i');
+        monBoutonLevelUp.classList.add('fas', 'fa-level-up-alt')
+        mesBout.appendChild(monBoutonLevelUp)
+
+        let monBoutonLevelDown=document.createElement('i');
+        monBoutonLevelDown.classList.add('fas', 'fa-level-down-alt')
+        mesBout.appendChild(monBoutonLevelDown)
+
+        let monBoutonTrash=document.createElement('i');
+        monBoutonTrash.classList.add('fas', 'fa-trash-alt')
+        mesBout.appendChild(monBoutonTrash)
+        
+
+        
     }
 
     Bougepostit(newX, newY){  //pour deplacer le post it
@@ -58,6 +101,11 @@ class Post_it {
     }
 }
 
+    let postitdep=false
+    let monPost_it
+    let postitExp=false
+    let Xposition
+    let Yposition
 
 function nouveauPost(){
     let monPost_it = new Post_it(200,200,100,100,'red', 'black', 'Salut', 'Ici')
@@ -72,18 +120,34 @@ function nouveauPost(){
 
 window.addEventListener('load', ()=>{
     document.getElementById('Jaune').addEventListener('click',()=>{
-        let monPost_it = new Post_it(300,100,120,120,'yellow', 'black', 'Salut', 'Ici')
+        monPost_it = new Post_it(300,100,120,120,'yellow', 'black', 'Salut', 'Ici')
         monPost_it.AffichPostit()
     })
     document.getElementById('Orange').addEventListener('click',()=>{
-        let monPost_it = new Post_it(500,200,120,120,'Orange', 'black', 'Salut', 'Ici')
+        monPost_it = new Post_it(500,200,120,120,'Orange', 'black', 'Salut', 'Ici')
         monPost_it.AffichPostit()
     })
     document.getElementById('Blue').addEventListener('click',()=>{
-        let monPost_it = new Post_it(200,200,120,120,'#4ac5eb', 'black', 'Salut', 'Ici')
+        monPost_it = new Post_it(200,200,120,120,'#4ac5eb', 'black', 'Salut', 'Ici')
         monPost_it.AffichPostit()
     })
+
+//Déplacement du post-it
+
+        document.body.addEventListener('mousemove', (e)=>{
+            Xposition = e.clientX
+            Yposition = e.clientY
+            if (postitdep){
+                monPost_it.Bougepostit(Xposition-50,Yposition-50);
+                monPost_it.AffichPostit();
+                }
+            if (postitExp){
+                monPost_it.redimPostit(monPost_it.largeurInit+(e.clientX-monPost_it.Xdepart), monPost_it.hauteurInit+(e.clientY-monPost_it.Ydepart))
+                monPost_it.AffichPostit()
+            }
+            }) 
 })
+
 
 
 /*
