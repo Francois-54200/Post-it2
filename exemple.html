@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <input type="text" id="cp">
+    <button id="bout">Verifier</button>
+    <script>
+        window.addEventListener('load', () => {
+            document.getElementById('bout').addEventListener('click', (e) => {
+                if (document.getElementById('cp').value.match(/[0-9]{5}/)) {
+                    alert('L\'input contient bien un code postal')
+                }
+                else {
+                    alert('L\'input ne contient pas un code postal')
+                }
+            })
+        })
+    </script>
+</body>
+
+</html>

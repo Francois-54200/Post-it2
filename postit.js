@@ -35,6 +35,8 @@ class Post_it {
         document.getElementById('postit').appendChild(monElem)
         monElem.innerHTML = this.texte
 
+        monElem.style.overflowWrap= "break-word"
+
         let mesBout=document.createElement('div');
         mesBout.className = 'Bout'
         monElem.appendChild(mesBout)
@@ -49,12 +51,18 @@ class Post_it {
         monBoutonDep.classList.add('fas', 'fa-arrows-alt')
         monBoutonDep.addEventListener('click',(e)=>{ 
             postitdep=!postitdep
+            numPost_it=this.id
             e.stopPropagation()
         })
         mesBout.appendChild(monBoutonDep)
 
         let monBoutonEdit=document.createElement('i');
         monBoutonEdit.classList.add('fas', 'fa-edit')
+        monBoutonEdit.addEventListener('click',(e)=>{ 
+            modifText=!modifText
+            numPost_it=this.id
+            e.stopPropagation()
+        })
         mesBout.appendChild(monBoutonEdit)
 
         let monBoutonExpand=document.createElement('i');
@@ -65,6 +73,7 @@ class Post_it {
             this.Xdepart=Xposition
             this.Ydepart=Yposition
             postitExp=!postitExp
+            numPost_it=this.id
             e.stopPropagation()
         })
         mesBout.appendChild(monBoutonExpand)
@@ -80,7 +89,8 @@ class Post_it {
         let monBoutonTrash=document.createElement('i');
         monBoutonTrash.classList.add('fas', 'fa-trash-alt')
         mesBout.appendChild(monBoutonTrash)
-            
+        
+        
     }
 
     Bougepostit(newX, newY){  //pour deplacer le post it
@@ -96,13 +106,20 @@ class Post_it {
         this.largeur = newLargeur
         this.hauteur = newHauteur
     }
+
+    editText(newText){
+        this.texte=newText
+    }
 }
 
+    let modifText = false
     let postitdep=false
     let monPost_it
     let postitExp=false
     let Xposition
     let Yposition
+    let TabPost_it=[]
+    let numPost_it
 
 function nouveauPost(){
     let monPost_it = new Post_it(200,200,100,100,'red', 'black', 'Salut', 'Ici')
@@ -116,17 +133,28 @@ function nouveauPost(){
 }
 
 window.addEventListener('load', ()=>{
+    let chaine=readCookie("monPost_it")
+    let TabTps=JSON.parse(chaine)
+    //console.log(TabTps)
+    for (let i in TabTps){
+        TabPost_it.push (new Post_it(TabTps[i].x,TabTps[i].y, TabTps[i].largeur, TabTps[i].hauteur, TabTps[i].Couleurdefond, TabTps[i].Couleurtexte, TabTps[i].texte, TabTps[i].id))
+        TabPost_it[TabPost_it.length-1].AffichPostit()
+    }
+    
     document.getElementById('Jaune').addEventListener('click',()=>{
-        monPost_it = new Post_it(300,100,120,120,'yellow', 'black', 'Salut', 'Ici')
-        monPost_it.AffichPostit()
+        monPost_it = new Post_it(300,100,120,120,'yellow', 'black', 'Salut', TabPost_it.length+1)
+        monPost_it.AffichPostit();
+        TabPost_it.push(monPost_it);
     })
     document.getElementById('Orange').addEventListener('click',()=>{
-        monPost_it = new Post_it(500,200,120,120,'Orange', 'black', 'Salut', 'Ici')
-        monPost_it.AffichPostit()
+        monPost_it = new Post_it(500,200,120,120,'Orange', 'black', 'Salut', TabPost_it.length+1)
+        monPost_it.AffichPostit();
+        TabPost_it.push(monPost_it);
     })
     document.getElementById('Blue').addEventListener('click',()=>{
-        monPost_it = new Post_it(200,200,120,120,'#4ac5eb', 'black', 'Salut', 'Ici')
-        monPost_it.AffichPostit()
+        monPost_it = new Post_it(200,200,120,120,'#4ac5eb', 'black', 'Salut', TabPost_it.length+1)
+        monPost_it.AffichPostit();
+        TabPost_it.push(monPost_it);
     })
 
 //Déplacement du post-it
@@ -135,17 +163,67 @@ window.addEventListener('load', ()=>{
             Xposition = e.clientX
             Yposition = e.clientY
             if (postitdep){
-                monPost_it.Bougepostit(Xposition-50,Yposition-50);
-                monPost_it.AffichPostit();
+                TabPost_it[numPost_it-1].Bougepostit(Xposition-50,Yposition-50);
+                TabPost_it[numPost_it-1].AffichPostit();
                 }
             if (postitExp){
-                monPost_it.redimPostit(monPost_it.largeurInit+(e.clientX-monPost_it.Xdepart), monPost_it.hauteurInit+(e.clientY-monPost_it.Ydepart))
-                monPost_it.AffichPostit()
+                TabPost_it[numPost_it-1].redimPostit(TabPost_it[numPost_it-1].largeurInit+(e.clientX-TabPost_it[numPost_it-1].Xdepart), TabPost_it[numPost_it-1].hauteurInit+(e.clientY-TabPost_it[numPost_it-1].Ydepart))
+                TabPost_it[numPost_it-1].AffichPostit()
             }
-            }) 
+            })
+
+})
+
+document.body.addEventListener('keydown', (e) => {
+    
+
+    if(modifText){
+    if(e.key=='Backspace'){
+        TabPost_it[numPost_it-1].modifText(TabPost_it[numPost_it-1].texte.substr(0, TabPost_it[numPost_it-1].texte.length-1))
+    }
+
+    else if(e.key=="Enter"){
+        TabPost_it[numPost_it-1].editText(TabPost_it[numPost_it-1].texte+'<br>')
+    }
+    
+    else{
+        TabPost_it[numPost_it-1].modifText(TabPost_it[numPost_it-1].texte+e.key)
+    }
+
+    TabPost_it[numPost_it-1].AffichPostit()
+    console.log(e)
+    }    
 })
 
 
+//Enregistrement de cookies
+setInterval(sauvePostit, 500)
+    function sauvePostit(){
+        let chaine=JSON.stringify(TabPost_it) 
+        //console.log(chaine)
+            createCookie("monPost_it", chaine, 30)
+    }
+
+    function createCookie(name,value,days) {
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime()+(days*24*60*60*1000));
+            var expires = "; expires="+date.toGMTString();
+        }
+        else var expires = "";
+        document.cookie = name+"="+value+expires+"; path=/";
+    }
+    
+    function readCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+    }
 
 /*
 let monPost_it = new Post_it(200,200,100,100,'red', 'black', 'Salut', 'Ici')
